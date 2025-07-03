@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chanakya AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .sci-fi-header {
+            padding: 32px 48px 0 48px;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #e0e6f7;
+            text-shadow: 0 2px 16px #0ff2, 0 0 2px #fff2;
+        }
+        .center-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .main-prompt {
+            font-size: 1.6rem;
+            font-weight: 500;
+            margin-bottom: 36px;
+            color: #fff;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .button-row {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 24px;
+        }
+        .main-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            background: transparent;
+            border: 2px solid #2e8fff;
+            border-radius: 32px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border 0.2s;
+            box-shadow: 0 2px 16px #2e8fff22;
+        }
+        .main-btn:hover {
+            background: #2e8fff;
+            color: #fff;
+            border-color: #fff;
+        }
+        .main-btn i {
+            font-size: 1.2em;
+        }
+        .sci-fi-panel {
+            background: #181c24;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 #2e8fff33;
+            border: 1px solid #2e8fff44;
+            padding: 2rem 2rem 1.5rem 2rem;
+            margin: 0 auto;
+            max-width: 480px;
+            width: 100%;
+            margin-top: 32px;
+        }
+        .sci-fi-panel h1, .sci-fi-panel h2 {
+            text-align: center;
+            color: #2e8fff;
+            margin-bottom: 1rem;
+        }
+        .sci-fi-panel label {
+            color: #e0e6f7;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .sci-fi-panel input, .sci-fi-panel textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            border: 1px solid #2e8fff44;
+            background: #23293a;
+            color: #fff;
+            font-size: 1rem;
+            resize: none;
+        }
+        .sci-fi-panel button {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: none;
+            background: #2e8fff;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sci-fi-panel button:hover {
+            background: #1a5fd6;
+        }
+        .sci-fi-panel .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #2e8fff;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem auto;
+            display: block;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .sci-fi-panel .error {
+            color: #ff4d4d;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .sci-fi-panel .success {
+            color: #2e8fff;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .vertical-scroll {
+            max-height: 60vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #2e8fff #23293a;
+        }
+        .vertical-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .vertical-scroll::-webkit-scrollbar-thumb {
+            background: #2e8fff;
+            border-radius: 4px;
+        }
+        .vertical-scroll::-webkit-scrollbar-track {
+            background: #23293a;
+        }
+        .chat-input-bar {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(0deg, #0a0a0a 90%, #0a0a0a00 100%);
+            padding: 24px 0 32px 0;
+            z-index: 10;
+        }
+        .chat-input-container {
+            display: flex;
+            align-items: center;
+            background: #181c24;
+            border-radius: 32px;
+            box-shadow: 0 2px 16px #2e8fff22;
+            padding: 0 8px 0 0;
+            width: 420px;
+            max-width: 90vw;
+        }
+        .chat-plus-btn {
+            background: none;
+            border: none;
+            color: #2e8fff;
+            font-size: 1.5rem;
+            margin: 0 12px 0 16px;
+            cursor: pointer;
+            outline: none;
+            transition: color 0.2s;
+        }
+        .chat-plus-btn:hover {
+            color: #fff;
+        }
+        .chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 16px 0;
+            border-radius: 32px;
+        }
+        @media (max-width: 600px) {
+            .sci-fi-header {
+                font-size: 1.2rem;
+                padding: 24px 16px 0 16px;
+            }
+            .main-prompt {
+                font-size: 1.1rem;
+            }
+            .button-row {
+                flex-direction: column;
+                gap: 18px;
+            }
+            .chat-input-container {
+                width: 98vw;
+                min-width: 0;
+            }
+            .sci-fi-panel {
+                padding: 1rem;
+            }
+        }
+        .chat-bubble-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .bubble {
+            max-width: 70%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 1.08rem;
+            word-break: break-word;
+            box-shadow: 0 2px 8px #0002;
+        }
+        .bubble-user {
+            align-self: flex-end;
+            background: #2e8fff;
+            color: #fff;
+            border-bottom-right-radius: 6px;
+        }
+        .bubble-ai {
+            align-self: flex-start;
+            background: #23293a;
+            color: #e0e6f7;
+            border-bottom-left-radius: 6px;
+        }
+        .bubble img {
+            max-width: 180px;
+            border-radius: 10px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sci-fi-header">Chanakya AI</div>
+
+    <!-- 1. Introduction Page -->
+    <div id="introPage" class="center-container">
+        <div class="sci-fi-panel vertical-scroll">
+            <h1>Welcome to Chanakya AI</h1>
+            <ul style="margin-bottom: 1.5rem;">
+                <li>Next-gen AI assistant for productivity, creativity, and automation.</li>
+                <li>Text, image, and email generation in one place.</li>
+                <li>Face authentication for secure access.</li>
+                <li>Modern sci-fi dashboard and seamless automations.</li>
+                <li>Real-time AI, no API keys needed for users.</li>
+            </ul>
+            <button onclick="showSignIn()">Get Started</button>
+        </div>
+    </div>
+
+    <!-- 2. Sign In/Up Page -->
+    <div id="authPage" class="center-container" style="display:none;">
+        <div class="sci-fi-panel">
+            <h2>Sign In / Sign Up</h2>
+            <form onsubmit="event.preventDefault(); startFaceAuth();">
+                <label for="auth-username">Username</label>
+                <input id="auth-username" type="text" required autocomplete="username">
+                <label for="auth-password">Password</label>
+                <input id="auth-password" type="password" required autocomplete="current-password">
+                <button type="submit">Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. Face Authentication Page (dummy, no real camera) -->
+    <div id="faceAuthPage" class="center-container" style="display:none;">
+        <div class="sci-fi-panel" style="text-align:center;">
+            <h2>Face Authentication</h2>
+            <div id="faceScanStatus">Scanning your face...</div>
+            <div class="spinner" id="faceSpinner"></div>
+        </div>
+    </div>
+
+    <!-- 4. Dashboard Page (Redesigned) -->
+    <div id="dashboardPage" class="center-container" style="display:none;">
+        <div class="main-prompt">What can I help with ?</div>
+        <div class="button-row">
+            <button class="main-btn" onclick="showPanel('upload')"><i class="fa-solid fa-upload"></i> Upload Image</button>
+            <button class="main-btn" onclick="showPanel('generate')"><i class="fa-solid fa-image"></i> Generate Image</button>
+            <button class="main-btn" onclick="showPanel('chat')"><i class="fa-solid fa-comments"></i> Let's Chat</button>
+        </div>
+        <div id="uploadPanel" class="sci-fi-panel" style="display:none;max-width:480px;width:100%;margin-top:32px;">
+            <h2>Upload Image</h2>
+            <input type="file" id="imageUploadInput" accept="image/*" style="margin-bottom:1rem;" onchange="handleImageUpload(event)">
+            <img id="uploadedImage" src="#" style="width:100%;margin-top:1rem;border-radius:12px;display:none;" alt="Uploaded Image">
+            <div id="uploadBubbles" class="chat-bubble-container"></div>
+        </div>
+        <div id="generatePanel" class="sci-fi-panel" style="display:none;max-width:480px;width:100%;margin-top:32px;">
+            <h2>Generate Image</h2>
+            <label for="imagePrompt">Enter Prompt for Image Generation:</label>
+            <textarea id="imagePrompt" rows="3"></textarea>
+            <button onclick="callImageAPI()">Generate Image</button>
+            <div id="imageBubbles" class="chat-bubble-container"></div>
+        </div>
+        <div id="chatPanel" class="sci-fi-panel" style="display:none;max-width:480px;width:100%;margin-top:32px;">
+            <h2>Let's Chat</h2>
+            <label for="textPrompt">Enter Prompt for Language Model:</label>
+            <textarea id="textPrompt" rows="3"></textarea>
+            <button onclick="callTextAPI()">Submit Text Prompt</button>
+            <div id="chatBubbles" class="chat-bubble-container"></div>
+        </div>
+        <div id="loading" class="spinner" style="display:none;"></div>
+        <div id="error" class="error" style="display:none;"></div>
+    </div>
+
+    <script>
+        // Navigation logic
+        function showSignIn() {
+            document.getElementById('introPage').style.display = 'none';
+            document.getElementById('authPage').style.display = 'flex';
+        }
+        function startFaceAuth() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('faceAuthPage').style.display = 'flex';
+            document.getElementById('faceScanStatus').textContent = 'Scanning your face...';
+            document.getElementById('faceSpinner').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('faceScanStatus').textContent = 'Authentication Complete!';
+                document.getElementById('faceSpinner').style.display = 'none';
+                setTimeout(() => {
+                    document.getElementById('faceAuthPage').style.display = 'none';
+                    document.getElementById('dashboardPage').style.display = 'flex';
+                    showPanel('chat'); // Open Let's Chat by default
+                }, 1000);
+            }, 5000);
+        }
+        // Dashboard logic
+        const showLoading = () => document.getElementById('loading').style.display = 'block';
+        const hideLoading = () => document.getElementById('loading').style.display = 'none';
+        const showError = (message) => {
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        };
+        const hideError = () => {
+            document.getElementById('error').style.display = 'none';
+        };
+        // Text-to-speech for AI responses
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.rate = 1.1;
+                utter.pitch = 1.1;
+                utter.volume = 1;
+                utter.lang = 'en-US';
+                window.speechSynthesis.speak(utter);
+            }
+        }
+        // Panel switching logic
+        function showPanel(panel) {
+            document.getElementById('uploadPanel').style.display = 'none';
+            document.getElementById('generatePanel').style.display = 'none';
+            document.getElementById('chatPanel').style.display = 'none';
+            if (panel === 'upload') {
+                document.getElementById('uploadPanel').style.display = 'block';
+            } else if (panel === 'generate') {
+                document.getElementById('generatePanel').style.display = 'block';
+            } else if (panel === 'chat') {
+                document.getElementById('chatPanel').style.display = 'block';
+            }
+        }
+        // Chat bubble helpers
+        function addChatBubble(user, ai) {
+            const chatBubbles = document.getElementById('chatBubbles');
+            // User bubble (right)
+            let userDiv = document.createElement('div');
+            userDiv.className = 'bubble bubble-user';
+            userDiv.textContent = user;
+            chatBubbles.appendChild(userDiv);
+            // AI bubble (left)
+            let aiDiv = document.createElement('div');
+            aiDiv.className = 'bubble bubble-ai';
+            aiDiv.textContent = ai;
+            chatBubbles.appendChild(aiDiv);
+        }
+        function addImageBubble(user, imageUrl) {
+            const imageBubbles = document.getElementById('imageBubbles');
+            // User bubble (right)
+            let userDiv = document.createElement('div');
+            userDiv.className = 'bubble bubble-user';
+            userDiv.textContent = user;
+            imageBubbles.appendChild(userDiv);
+            // AI bubble (left, image)
+            let aiDiv = document.createElement('div');
+            aiDiv.className = 'bubble bubble-ai';
+            aiDiv.innerHTML = `<img src='${imageUrl}' alt='Generated Image'>`;
+            imageBubbles.appendChild(aiDiv);
+        }
+        function addUploadBubble(imageUrl, answer) {
+            const uploadBubbles = document.getElementById('uploadBubbles');
+            // User bubble (right, image)
+            let userDiv = document.createElement('div');
+            userDiv.className = 'bubble bubble-user';
+            userDiv.innerHTML = `<img src='${imageUrl}' alt='Uploaded Image'>`;
+            uploadBubbles.appendChild(userDiv);
+            // AI bubble (left, answer)
+            let aiDiv = document.createElement('div');
+            aiDiv.className = 'bubble bubble-ai';
+            aiDiv.innerHTML = answer;
+            uploadBubbles.appendChild(aiDiv);
+        }
+        // Let's Chat (with chat bubbles, no extra text)
+        async function callTextAPI() {
+            const prompt = document.getElementById('textPrompt').value;
+            if (!prompt) return;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            try {
+                const response = await fetch('https://backend.buildpicoapps.com/aero/run/llm-api?pk=v1-Z0FBQUFBQm9aamQ2Y0lWaFFfdTVJQUR6b2otSlU1eEZOZ3p1bzFYcWdTLXhBZEpIWFR4RjdtRmNuTzcwQlBJTTVlQ0owd3hzbTRLblRMNkpSODZxcWNZb01IaXFfM0hyMUE9PQ==', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                if (data.status === 'success' && data.text) {
+                    addChatBubble(prompt, data.text);
+                } else {
+                    document.getElementById('error').textContent = 'Failed to get valid response from AI API.';
+                    document.getElementById('error').style.display = 'block';
+                }
+            } catch (err) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').textContent = 'An error occurred while calling AI API.';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+        // Generate Image (with chat bubbles, no extra image)
+        async function callImageAPI() {
+            const prompt = document.getElementById('imagePrompt').value;
+            if (!prompt) return;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            try {
+                const response = await fetch('https://backend.buildpicoapps.com/aero/run/image-generation-api?pk=v1-Z0FBQUFBQm9aamQ2cWNqbXhpMHZOTGVwUVh4ZFdzZ1ZGZ090bEM0NXhLbHFqMks5ZzE4TlFoOUhES3duQmtkeTMyYkdWRkVkNEUzc2hjRGRtRkQ5UEpFVHBLdFpUYkhOQ0E9PQ==', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                if (data.status === 'success' && data.imageUrl) {
+                    addImageBubble(prompt, data.imageUrl);
+                } else {
+                    document.getElementById('error').textContent = 'Failed to generate image.';
+                    document.getElementById('error').style.display = 'block';
+                }
+            } catch (err) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').textContent = 'An error occurred while generating image.';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+        // Upload image (with chat bubbles, no extra text)
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    document.getElementById('uploadedImage').src = e.target.result;
+                    document.getElementById('uploadedImage').style.display = 'block';
+                    // Convert to base64 (strip the data URL prefix)
+                    const base64Data = e.target.result.split(',')[1];
+                    // Prepare Gemini API payload
+                    const payload = {
+                        contents: [
+                            {
+                                parts: [
+                                    { text: 'Tell me about this instrument' },
+                                    {
+                                        inline_data: {
+                                            mime_type: file.type || 'image/jpeg',
+                                            data: base64Data
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    };
+                    try {
+                        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyC8etyHQ4I6o7ycsHtSsdX_4e-v0OOtuFU', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const data = await response.json();
+                        let result = 'No description found.';
+                        if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text) {
+                            result = data.candidates[0].content.parts[0].text;
+                        } else if (data.error && data.error.message) {
+                            result = 'Error: ' + data.error.message;
+                        }
+                        // Clean up answer: remove asterisks, format as bullet points if needed
+                        result = result.replace(/\*+/g, '').trim();
+                        if (result.includes('\n')) {
+                            let lines = result.split('\n').filter(l => l.trim());
+                            if (lines.length > 1) {
+                                result = '<ul>' + lines.map(l => `<li>${l}</li>`).join('') + '</ul>';
+                            } else {
+                                result = lines[0];
+                            }
+                        }
+                        addUploadBubble(e.target.result, result);
+                    } catch (err) {
+                        addUploadBubble(e.target.result, 'Error analyzing image.');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+
+</html> 
